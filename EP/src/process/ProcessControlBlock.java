@@ -1,7 +1,7 @@
 package process;
 import util.*;
 
-class ProcessControlBlock {
+public class ProcessControlBlock {
     private int programCounter;
     private ProcessState state;
     private int priority;

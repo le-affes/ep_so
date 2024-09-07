@@ -1,7 +1,7 @@
 package process;
 import util.*;
 
-class Process {
+public class Process {
     private int id;
     private Program program;
     private ProcessControlBlock BCP;

@@ -1,8 +1,9 @@
 package system;
-import util.*;
+import process.*;
+import process.Process;
 import java.util.ArrayList;
 
-class Scheduler {
+public class Scheduler {
     public static final int MAX_COM = 100;
     public static int X;
     public static int Y;

@@ -1,7 +1,7 @@
 package process;
 import util.*;
 
-class Program {
+public class Program {
     private String name;
     private int priority;
     private String[] textSegment;

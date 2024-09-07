@@ -2,7 +2,7 @@ package system;
 import util.Command;
 
 // Class System (Sistema)
-class System {
+public class System {
     public void readFiles() {
         // Lógica para ler arquivos
     }
