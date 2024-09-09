@@ -1,14 +1,14 @@
 package process;
-import util.*;
+
+import java.util.List;
 
 public class Program {
     private String name;
-    private int priority;
-    private String[] textSegment;
+    private Integer priority;
+    private List<String> textSegment;
 
-    public Program(String name, int priority, String[] textSegment) {
+    public Program(String name, List<String> textSegment) {
         this.name = name;
-        this.priority = priority;
         this.textSegment = textSegment;
     }
 
@@ -21,19 +21,20 @@ public class Program {
         this.name = name;
     }
 
-    public int getPriority() {
+    public Integer getPriority() {
         return priority;
     }
 
-    public void setPriority(int priority) {
+    public void setPriority(Integer priority) {
         this.priority = priority;
     }
 
-    public String[] getTextSegment() {
+    public List<String> getTextSegment() {
         return textSegment;
     }
 
-    public void setTextSegment(String[] textSegment) {
+    public void setTextSegment(List<String> textSegment) {
         this.textSegment = textSegment;
     }
+
 }
