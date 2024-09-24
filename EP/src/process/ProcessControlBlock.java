@@ -1,4 +1,5 @@
 package process;
+
 import util.*;
 
 public class ProcessControlBlock {
@@ -8,6 +9,7 @@ public class ProcessControlBlock {
     private int creditCounter;
     private int[] generalRegisters;
     private int textSegmentRef;
+    private int waitingTime;
 
     public ProcessControlBlock(int programCounter, ProcessState state, int priority, int creditCounter, int[] generalRegisters, int textSegmentRef) {
         this.programCounter = programCounter;
@@ -16,6 +18,15 @@ public class ProcessControlBlock {
         this.creditCounter = creditCounter;
         this.generalRegisters = generalRegisters;
         this.textSegmentRef = textSegmentRef;
+    }
+
+    public ProcessControlBlock(int priority) {
+        this.priority = priority;
+        state = ProcessState.PRONTO;
+        textSegmentRef = 0;
+        creditCounter = priority;
+        waitingTime = 0;
+        generalRegisters = new int[2];
     }
 
     // Getters and Setters
@@ -51,19 +62,35 @@ public class ProcessControlBlock {
         this.creditCounter = creditCounter;
     }
 
-    public int[] getGeneralRegisters() {
-        return generalRegisters;
-    }
-
-    public void setGeneralRegisters(int[] generalRegisters) {
-        this.generalRegisters = generalRegisters;
-    }
-
     public int getTextSegmentRef() {
         return textSegmentRef;
     }
 
     public void setTextSegmentRef(int textSegmentRef) {
         this.textSegmentRef = textSegmentRef;
+    }
+
+    public int getWaitingTime() {
+        return waitingTime;
+    }
+
+    public void setWaitingTime(int waitingTime) {
+        this.waitingTime = waitingTime;
+    }
+
+    public void setX(int value) {
+        generalRegisters[0] = value;
+    }
+
+    public void setY(int value) {
+        generalRegisters[1] = value;
+    }
+
+    public int getX() {
+        return generalRegisters[0];
+    }
+
+    public int getY() {
+        return generalRegisters[1];
     }
 }

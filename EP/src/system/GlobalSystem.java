@@ -1,18 +1,24 @@
 package system;
+
 import process.Program;
-import util.Command;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 
 // Class System (Sistema)
 public class GlobalSystem {
+    public static String PATH = "src\\system\\programs\\";
+    public static String FILE_PATH = "src\\system\\";
+    public static int X;
+    public static int Y;
 
-    public Program readPrograms(String filePath) throws IOException {
+    public static Program readPrograms(String filePath) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(filePath));
         String name;
         List<String> textSegments = new ArrayList<>();
@@ -28,7 +34,7 @@ public class GlobalSystem {
         return new Program(name, textSegments);
     }
 
-    public List<Integer> readPriority(String filePath) throws IOException {
+    public static List<Integer> readPriority(String filePath) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(filePath));
         List<Integer> priority = new ArrayList<>();
 
@@ -41,23 +47,13 @@ public class GlobalSystem {
         return priority;
     }
 
-    public void setPriorities(List<Integer> priorities, List<Program> programs) {
+    public static void setPriorities(List<Integer> priorities, List<Program> programs) {
         for (int i = 0; i < programs.size(); i++) {
-            String title = String.format("TESTE-%d", priorities.get(i));
-
-            Optional<Program> programOpt = programs.stream()
-                    .filter(p -> p.getName().equals(title))
-                    .findAny();
-
-            if (programOpt.isPresent()) {
-                Program program = programOpt.get();
-                if(program.getPriority() == null) program.setPriority(i + 1);
-
-            }
+            programs.get(i).setPriority(priorities.get(i));
         }
     }
 
-    public int readQuantum(String filePath) throws IOException {
+    public static int readQuantum(String filePath) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(filePath));
         int quantum = Integer.parseInt(reader.readLine());
         reader.close();
@@ -65,10 +61,20 @@ public class GlobalSystem {
         return quantum;
     }
 
+    public static void writeFile(int quantum, String conteudo) {
+        System.out.println(conteudo);
+        String caminhoArquivo = FILE_PATH + "\\output\\" + String.format("%02d", quantum) + ".txt";
+        File file = new File(caminhoArquivo);
 
+        boolean appendMode = file.exists();
 
-    public Command readCommand() {
-        // Lógica para ler um comando
-        return Command.COM; // Retorno de exemplo
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(caminhoArquivo, appendMode))) {
+            writer.write(conteudo);
+            writer.newLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
+
 }
