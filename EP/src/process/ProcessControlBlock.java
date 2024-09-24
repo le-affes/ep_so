@@ -3,39 +3,28 @@ package process;
 import util.*;
 
 public class ProcessControlBlock {
-    private int programCounter;
     private ProcessState state;
     private int priority;
     private int creditCounter;
     private int[] generalRegisters;
-    private int textSegmentRef;
+    private int programCounter;
     private int waitingTime;
 
-    public ProcessControlBlock(int programCounter, ProcessState state, int priority, int creditCounter, int[] generalRegisters, int textSegmentRef) {
+    public ProcessControlBlock(int programCounter, ProcessState state, int priority, int creditCounter, int[] generalRegisters) {
         this.programCounter = programCounter;
         this.state = state;
         this.priority = priority;
         this.creditCounter = creditCounter;
         this.generalRegisters = generalRegisters;
-        this.textSegmentRef = textSegmentRef;
     }
 
     public ProcessControlBlock(int priority) {
         this.priority = priority;
         state = ProcessState.PRONTO;
-        textSegmentRef = 0;
+        programCounter = 0;
         creditCounter = priority;
         waitingTime = 0;
         generalRegisters = new int[2];
-    }
-
-    // Getters and Setters
-    public int getProgramCounter() {
-        return programCounter;
-    }
-
-    public void setProgramCounter(int programCounter) {
-        this.programCounter = programCounter;
     }
 
     public ProcessState getState() {
@@ -62,12 +51,12 @@ public class ProcessControlBlock {
         this.creditCounter = creditCounter;
     }
 
-    public int getTextSegmentRef() {
-        return textSegmentRef;
+    public int getProgramCounter() {
+        return programCounter;
     }
 
-    public void setTextSegmentRef(int textSegmentRef) {
-        this.textSegmentRef = textSegmentRef;
+    public void setProgramCounter(int programCounter) {
+        this.programCounter = programCounter;
     }
 
     public int getWaitingTime() {

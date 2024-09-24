@@ -54,10 +54,10 @@ public class Process {
     }
 
     public Command getCommand() {
-        if(BCP.getTextSegmentRef() >= getTextSegment().size())
+        if(BCP.getProgramCounter() >= getTextSegment().size())
             return Command.SAIDA;
 
-        String current = getTextSegment().get(BCP.getTextSegmentRef());
+        String current = getTextSegment().get(BCP.getProgramCounter());
         Command currentCommand;
         if (current.equals("COM"))
             currentCommand = Command.COM;
@@ -75,7 +75,7 @@ public class Process {
             currentCommand = Command.SAIDA;
         }
 
-        BCP.setTextSegmentRef(BCP.getTextSegmentRef() + 1);
+        BCP.setProgramCounter(BCP.getProgramCounter() + 1);
         return currentCommand;
     }
 
