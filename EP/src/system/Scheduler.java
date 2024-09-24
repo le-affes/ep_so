@@ -40,16 +40,20 @@ public class Scheduler {
             tableProcess.add(processControlBlock);
         }
 
-        Collections.sort(readyProcesses, new Comparator<Process>() {
-            @Override
-            public int compare(Process p1, Process p2) {
-                return Integer.compare(p2.getBCP().getPriority(), p1.getBCP().getPriority());
-            }
-        });
+        orderProcesses(readyProcesses);
 
         for (Process process : readyProcesses) {
             GlobalSystem.writeFile(QUANTUM, "Carregando " + process.getProgram().getName());
         }
+    }
+
+    private void orderProcesses(ArrayList<Process> processes) {
+        Collections.sort(processes, new Comparator<Process>() {
+            @Override
+            public int compare(Process p1, Process p2) {
+                return Integer.compare(p2.getBCP().getCreditCounter(), p1.getBCP().getCreditCounter());
+            }
+        });
     }
 
     private void restartCreditCounter() {
@@ -63,25 +67,25 @@ public class Scheduler {
         }
     }
 
-    private int getPriority(ArrayList<Process> processes, int currentProcess) {
-        if (processes.isEmpty())
-            return -1;
-
-        Process mostPriorProcess = new Process();
-        Process aux = mostPriorProcess;
-
-        for (Process process : processes) {
-            if (process.getBCP().getCreditCounter() > aux.getBCP().getCreditCounter())
-                mostPriorProcess = process;
-            aux = process;
-        }
-
-        if (currentProcess != -1 && processes.size() > currentProcess &&
-                mostPriorProcess.getBCP().getCreditCounter() == processes.get(currentProcess).getBCP().getCreditCounter())
-            return currentProcess;
-
-        return processes.indexOf(mostPriorProcess);
-    }
+//    private int getPriority(ArrayList<Process> processes, int currentProcess) {
+//        if (processes.isEmpty())
+//            return -1;
+//
+//        Process mostPriorProcess = new Process();
+//        Process aux = mostPriorProcess;
+//
+//        for (Process process : processes) {
+//            if (process.getBCP().getCreditCounter() > aux.getBCP().getCreditCounter())
+//                mostPriorProcess = process;
+//            aux = process;
+//        }
+//
+//        if (currentProcess != -1 && processes.size() > currentProcess &&
+//                mostPriorProcess.getBCP().getCreditCounter() == processes.get(currentProcess).getBCP().getCreditCounter())
+//            return currentProcess;
+//
+//        return processes.indexOf(mostPriorProcess);
+//    }
 
     private void freeBlocked() {
         for (Process blocked : blockedProcesses)
@@ -94,80 +98,70 @@ public class Scheduler {
     }
 
     private void executeProcess(Process currentProcess) {
+        if (currentProcess.getCreditCounter() == 0)
+            return;
+
+        GlobalSystem.writeFile(QUANTUM, "\nExecutando " + readyProcesses.getFirst().getProgram().getName());
+
         currentProcess.setExecuting();
         Command currentCommand;
         GlobalSystem.X = currentProcess.getBCP().getX();
         GlobalSystem.Y = currentProcess.getBCP().getY();
 
-        for (int i = 0; i < QUANTUM; ) {
-            if (currentProcess.getCreditCounter() == 0)
-                break;
+        int i = 0;
+        for (i = 0; i < QUANTUM; i++) {
 
             currentCommand = currentProcess.getCommand();
             if (currentCommand == Command.COM) {
                 currentProcess.executeCommand();
-                executedInstructions += 1;
-                i += 1;
             } else if (currentCommand == Command.ES) {
-                executedInstructions += 1;
+                currentProcess.executeCommand();
                 currentProcess.block();
-                GlobalSystem.writeFile(QUANTUM, "E/S iniciada em " + currentProcess.getProgram().getName() + " após " + executedInstructions + " instruções.");
+                i += 1;
+                GlobalSystem.writeFile(QUANTUM, "E/S iniciada em " + currentProcess.getProgram().getName() + " após " + i + " instruções.");
                 readyProcesses.remove(currentProcess);
                 blockedProcesses.add(currentProcess);
-                countQuantum += 1;
-                return;
+                break;
             } else if (currentCommand == Command.REGISTERVALUE) {
-                executedInstructions += 1;
+
             } else if (currentCommand == Command.SAIDA) {
-                executedInstructions += 1;
                 readyProcesses.remove(currentProcess);
-                currentProcess.getBCP().setState(ProcessState.BLOQUEADO);
+                currentProcess.setCreditCounter(0);
                 GlobalSystem.writeFile(QUANTUM, currentProcess.getProgram().getName() + " terminado. X=" + GlobalSystem.X + " Y=" + GlobalSystem.Y);
-                countQuantum += 1;
+                executedInstructions += 1;
                 return;
             }
+            executedInstructions += 1;
         }
-
         countQuantum += 1;
+
+        swichProcesses += 1;
+        GlobalSystem.writeFile(QUANTUM, "Interrompendo " + currentProcess.getProgram().getName() + " após " + i + " instruções.");
+
         currentProcess.setReady();
     }
 
     public void executeProcesses() {
-        int index = getPriority(readyProcesses, -1);
-        String lastName = "";
-        Process lastProcess = null;
-        Process currentProcess = null;
-        GlobalSystem.writeFile(QUANTUM, "\nExecutando " + readyProcesses.get(index).getProgram().getName());
+
+        Process currentProcess = readyProcesses.getFirst();
+        double countProcesses = (double) readyProcesses.size();
 
         while (!readyProcesses.isEmpty() || !blockedProcesses.isEmpty()) {
-            currentProcess = readyProcesses.get(index);
-
-            if (lastProcess != null && currentProcess != lastProcess && currentProcess.getCreditCounter() != 0) {
-                countExecutedInstructions += executedInstructions;
-
-                if (lastProcess.getBCP().getState() != ProcessState.BLOQUEADO)
-                    GlobalSystem.writeFile(QUANTUM, "Interrompendo " + lastProcess.getProgram().getName() + " após " + executedInstructions + " instruções.");
-                GlobalSystem.writeFile(QUANTUM, "\n");
-                GlobalSystem.writeFile(QUANTUM, "Executando " + currentProcess.getProgram().getName());
-
-                swichProcesses += 1;
-                executedInstructions = 0;
-            }
-
-            executeProcess(currentProcess);
-            restartCreditCounter();
-
             do freeBlocked();
             while (readyProcesses.isEmpty() && !blockedProcesses.isEmpty());
 
-            lastProcess = currentProcess;
-            index = getPriority(readyProcesses, index);
+            if (readyProcesses.getFirst().getCreditCounter() > currentProcess.getCreditCounter())
+                currentProcess = readyProcesses.getFirst();
+
+            executeProcess(currentProcess);
+            restartCreditCounter();
+            orderProcesses(readyProcesses);
         }
 
-        float averageInstructions = (float) countExecutedInstructions /countQuantum;
+        double averageSwichProcesses = (double) swichProcesses / countProcesses;
+        double averageInstructions = (double) executedInstructions / countQuantum;
 
-        GlobalSystem.writeFile(QUANTUM, "\nTrocas de processo: " + swichProcesses);
-        GlobalSystem.writeFile(QUANTUM, "Média de instruções por quantum: " + averageInstructions);
-
+        GlobalSystem.writeFile(QUANTUM, "Média de trocas " + averageSwichProcesses);
+        GlobalSystem.writeFile(QUANTUM, "Média de instruções " + averageInstructions);
     }
 }

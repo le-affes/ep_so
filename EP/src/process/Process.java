@@ -83,6 +83,10 @@ public class Process {
         return BCP.getCreditCounter();
     }
 
+    public void setCreditCounter(int value){
+        this.BCP.setCreditCounter(value);
+    }
+
     public void block() {
         BCP.setState(ProcessState.BLOQUEADO);
         BCP.setWaitingTime(2);
@@ -97,7 +101,8 @@ public class Process {
     }
 
     public void decrementWaitingTime() {
-        BCP.setWaitingTime(BCP.getWaitingTime() - 1);
+        if(BCP.getWaitingTime()>0)
+            BCP.setWaitingTime(BCP.getWaitingTime() - 1);
     }
 
     private int getRegisterValue(String str) {
