@@ -2,6 +2,8 @@ package process;
 
 import util.*;
 
+import java.util.List;
+
 public class ProcessControlBlock {
     private ProcessState state;
     private int priority;
@@ -9,6 +11,8 @@ public class ProcessControlBlock {
     private int[] generalRegisters;
     private int programCounter;
     private int waitingTime;
+    private List<String> textSegment;
+
 
     public ProcessControlBlock(int programCounter, ProcessState state, int priority, int creditCounter, int[] generalRegisters) {
         this.programCounter = programCounter;

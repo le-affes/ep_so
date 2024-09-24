@@ -99,7 +99,7 @@ public class Scheduler {
         GlobalSystem.X = currentProcess.getBCP().getX();
         GlobalSystem.Y = currentProcess.getBCP().getY();
 
-        for (int i = 0; i < QUANTUM - 1; ) {
+        for (int i = 0; i < QUANTUM; ) {
             if (currentProcess.getCreditCounter() == 0)
                 break;
 
