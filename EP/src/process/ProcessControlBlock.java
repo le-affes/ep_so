@@ -1,30 +1,30 @@
 package process;
+
 import util.*;
 
 public class ProcessControlBlock {
-    private int programCounter;
     private ProcessState state;
     private int priority;
     private int creditCounter;
     private int[] generalRegisters;
-    private int textSegmentRef;
+    private int programCounter;
+    private int waitingTime;
 
-    public ProcessControlBlock(int programCounter, ProcessState state, int priority, int creditCounter, int[] generalRegisters, int textSegmentRef) {
+    public ProcessControlBlock(int programCounter, ProcessState state, int priority, int creditCounter, int[] generalRegisters) {
         this.programCounter = programCounter;
         this.state = state;
         this.priority = priority;
         this.creditCounter = creditCounter;
         this.generalRegisters = generalRegisters;
-        this.textSegmentRef = textSegmentRef;
     }
 
-    // Getters and Setters
-    public int getProgramCounter() {
-        return programCounter;
-    }
-
-    public void setProgramCounter(int programCounter) {
-        this.programCounter = programCounter;
+    public ProcessControlBlock(int priority) {
+        this.priority = priority;
+        state = ProcessState.PRONTO;
+        programCounter = 0;
+        creditCounter = priority;
+        waitingTime = 0;
+        generalRegisters = new int[2];
     }
 
     public ProcessState getState() {
@@ -51,19 +51,35 @@ public class ProcessControlBlock {
         this.creditCounter = creditCounter;
     }
 
-    public int[] getGeneralRegisters() {
-        return generalRegisters;
+    public int getProgramCounter() {
+        return programCounter;
     }
 
-    public void setGeneralRegisters(int[] generalRegisters) {
-        this.generalRegisters = generalRegisters;
+    public void setProgramCounter(int programCounter) {
+        this.programCounter = programCounter;
     }
 
-    public int getTextSegmentRef() {
-        return textSegmentRef;
+    public int getWaitingTime() {
+        return waitingTime;
     }
 
-    public void setTextSegmentRef(int textSegmentRef) {
-        this.textSegmentRef = textSegmentRef;
+    public void setWaitingTime(int waitingTime) {
+        this.waitingTime = waitingTime;
+    }
+
+    public void setX(int value) {
+        generalRegisters[0] = value;
+    }
+
+    public void setY(int value) {
+        generalRegisters[1] = value;
+    }
+
+    public int getX() {
+        return generalRegisters[0];
+    }
+
+    public int getY() {
+        return generalRegisters[1];
     }
 }
